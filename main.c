@@ -12,11 +12,10 @@ typedef struct block_header
     struct block_header *prev;
 } BlockHeader;
 
-static BlockHeader *heap_base = NULL;
 
 void init()
 {
-    heap_base = (BlockHeader *)MY_HEAP;
+    BlockHeader *heap_base = (BlockHeader *)MY_HEAP;
     heap_base->size = sizeof(MY_HEAP) - sizeof(BlockHeader);
     heap_base->is_free = 1;
     heap_base->next = NULL;
@@ -25,6 +24,7 @@ void init()
 
 BlockHeader *find_free_block(size_t size)
 {
+    BlockHeader *heap_base = (BlockHeader *)MY_HEAP;
     BlockHeader *current = heap_base;
     while (current)
     {
@@ -39,6 +39,7 @@ BlockHeader *find_free_block(size_t size)
 
 void *my_malloc(size_t size)
 {
+    BlockHeader *heap_base = (BlockHeader *)MY_HEAP;
     if (heap_base == NULL)// Si le heap n'est pas initialisé
     { 
         init();
@@ -110,7 +111,7 @@ int main()
     init();
     int *int_ptr = (int *)my_malloc(sizeof(int));
     double *double_ptr = (double *)my_malloc(sizeof(double));
-    char *char_ptr = (char *)my_malloc( sizeof(char));
+    char *char_ptr = (char *)my_malloc(10*sizeof(char));
 
     if (int_ptr)
     {
@@ -127,7 +128,7 @@ int main()
     if (char_ptr)
     {
         snprintf(char_ptr, 10, "Hello");
-        printf("Char: %zu bytes\n", sizeof(char));
+        printf("Char: %zu bytes\n", 10*sizeof(char));
     }
 
     my_free(int_ptr);
