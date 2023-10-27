@@ -39,6 +39,14 @@ BlockHeader *find_free_block(size_t size)
     return NULL;
 }
 
+void merge_blocks(BlockHeader *block, BlockHeader *adjacent_block) {
+    block->size += sizeof(BlockHeader) + adjacent_block->size;
+    block->next = adjacent_block->next;
+    if (adjacent_block->next) {
+        adjacent_block->next->prev = block;
+    }
+}
+
 void *my_malloc(size_t size)
 {
     BlockHeader *heap_base = (BlockHeader *)MY_HEAP;
@@ -87,24 +95,14 @@ void my_free(void *pointer)
     BlockHeader *next_block = block->next;
     if (next_block && next_block->is_free)
     {
-        block->size += sizeof(BlockHeader) + next_block->size;
-        block->next = next_block->next;
-        if (next_block->next)
-        {
-            next_block->next->prev = block;
-        }
+        merge_blocks(block, next_block);
     }
 
     // Fusion avec le bloc précédent
     BlockHeader *prev_block = block->prev;
     if (prev_block && prev_block->is_free)
     {
-        prev_block->size += sizeof(BlockHeader) + block->size;
-        prev_block->next = block->next;
-        if (block->next)
-        {
-            block->next->prev = prev_block;
-        }
+        merge_blocks(prev_block, block);
     }
 }
 
