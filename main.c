@@ -8,6 +8,7 @@ typedef struct block_header
 {
     size_t size;
     int8_t is_free;
+    int8_t is_initialized;
     struct block_header *next;
     struct block_header *prev;
 } BlockHeader;
@@ -18,6 +19,7 @@ void init()
     BlockHeader *heap_base = (BlockHeader *)MY_HEAP;
     heap_base->size = sizeof(MY_HEAP) - sizeof(BlockHeader);
     heap_base->is_free = 1;
+    heap_base->is_initialized = 1;
     heap_base->next = NULL;
     heap_base->prev = NULL;
 }
@@ -40,7 +42,7 @@ BlockHeader *find_free_block(size_t size)
 void *my_malloc(size_t size)
 {
     BlockHeader *heap_base = (BlockHeader *)MY_HEAP;
-    if (heap_base == NULL)// Si le heap n'est pas initialisé
+    if (!heap_base->is_initialized)// Si le heap n'est pas initialisé
     { 
         init();
     }
